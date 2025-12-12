@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Ваш аккаунт — INSide</title>
+    <link rel="stylesheet" href="account.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <a href="index.html" class="logo">
+            <img src="images/logo.png" alt="INSide logo">
+            <span class="logo-text">INSide</span>
+        </a>
+
+        <nav class="menu">
+            <a href="account.html" class="menu-item active">
+                <img src="images/user-icon.png" class="icon" alt="Аккаунт">
+                <span class="menu-text">Аккаунт</span>
+            </a>
+
+            <a href="index.html" class="menu-item">
+                <img src="images/info-icon.png" class="icon" alt="О нас">
+                <span class="menu-text">О нас</span>
+            </a>
+
+            <div class="menu-item">
+                <img src="images/heart-icon.png" class="icon" alt="Избранное">
+                <span class="menu-text">Избранное</span>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <div class="top-bar">
+            <h1 class="title">Ваш аккаунт</h1>
+            <button class="auth-btn" id="openAuthModal">Зарегистрироваться/Войти</button>
+        </div>
+
+        <div class="profile">
+            <div class="avatar">
+                <img src="images/avatar.png" alt="Мое фото">
+            </div>
+            <div class="info">
+                <h2 class="name">Маргарита<br>Анатольевна</h2>
+                <p class="email">margoanatoliy@gmail.com</p>
+            </div>
+        </div>
+
+        <div class="card-list">
+            <div class="card">Главный корпус ПетрГУ</div>
+            <div class="card">Офис OZON</div>
+            <button class="add-card">+ Добавить новую карту</button>
+        </div>
+    </main>
+</div>
+
+<!-- Модальное окно -->
+<div class="modal-overlay" id="authModalOverlay">
+    <div class="auth-modal" id="authModal">
+        <button class="close-modal" id="closeAuthModal">×</button>
+        
+        <div class="auth-tabs">
+            <button class="tab-btn active" data-tab="login">Вход</button>
+            <button class="tab-btn" data-tab="register">Регистрация</button>
+        </div>
+
+        <div class="tab-content active" id="loginTab">
+            <h2>Вход в аккаунт</h2>
+            <form class="auth-form">
+                <input type="email" placeholder="Имя пользователя или Email" required>
+                <input type="password" placeholder="Пароль" required>
+                <button type="submit" class="submit-btn">Войти</button>
+            </form>
+            <p class="auth-link">Нет аккаунта? <a href="#" class="switch-tab" data-tab="register">Зарегистрируйтесь</a></p>
+        </div>
+
+        <div class="tab-content" id="registerTab">
+            <h2>Создание аккаунта</h2>
+            <form class="auth-form">
+                <input type="text" placeholder="Имя" required>
+                <input type="text" placeholder="Фамилия" required>
+                <input type="email" placeholder="Email" required>
+                <input type="password" placeholder="Пароль" required>
+                <input type="password" placeholder="Повторите пароль" required>
+                <button type="submit" class="submit-btn">Зарегистрироваться</button>
+            </form>
+            <p class="auth-link">Уже есть аккаунт? <a href="#" class="switch-tab" data-tab="login">Войдите</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const openModalBtn = document.getElementById('openAuthModal');
+    const closeModalBtn = document.getElementById('closeAuthModal');
+    const modalOverlay = document.getElementById('authModalOverlay');
+    const modal = document.getElementById('authModal');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const switchTabLinks = document.querySelectorAll('.switch-tab');
+
+    openModalBtn.addEventListener('click', () => {
+        modalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        modalOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    });
+
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.getAttribute('data-tab');
+            
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabId + 'Tab') {
+                    content.classList.add('active');
+                }
+            });
+        });
+    });
+
+    switchTabLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const tabId = link.getAttribute('data-tab');
+            
+            tabBtns.forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabId + 'Tab') {
+                    content.classList.add('active');
+                }
+            });
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    document.querySelectorAll('.auth-form').forEach(form => {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Форма отправлена!');
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Inside — Планировка</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <a href="index.html" class="logo">
+            <img src="images/logo.png" alt="INSide logo">
+            <span class="logo-text">INSide</span>
+        </a>
+
+        <nav class="menu">
+            <a href="account.html" class="menu-item">
+                <img src="images/user-icon.png" class="icon" alt="Аккаунт">
+                <span class="menu-text">Аккаунт</span>
+            </a>
+
+            <a href="index.html" class="menu-item">
+                <img src="images/info-icon.png" class="icon" alt="О нас">
+                <span class="menu-text">О нас</span>
+            </a>
+
+            <div class="menu-item">
+                <img src="images/heart-icon.png" class="icon" alt="Избранное">
+                <span class="menu-text">Избранное</span>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content-wrapper">
+        <div class="top-bar">
+            <div class="search-container">
+                <input type="text" placeholder="Поиск кабинета" class="search" id="searchInput">
+            </div>
+            <button class="error-btn">Сообщить об ошибке</button>
+        </div>
+
+        <div class="floor-select-wrapper">
+            <button class="floor-btn" id="floorButton">План 1 этажа</button>
+            <div class="floor-dropdown" id="floorDropdown">
+                <div class="floor-item">План 1 этажа</div>
+                <div class="floor-item">План 2 этажа</div>
+                <div class="floor-item">План 3 этажа</div>
+                <div class="floor-item">План 4 этажа</div>
+                <div class="floor-item">План 5 этажа</div>
+            </div>
+        </div>
+
+        <div class="plan-container">
+            <div class="plan-wrapper" id="planWrapper">
+                <img src="images/plan.jpg" class="plan-image" id="planImage" alt="План этажа">
+            </div>
+
+            <div class="zoom">
+                <button class="zoom-btn" id="zoomIn">+</button>
+                <button class="zoom-btn" id="zoomOut">−</button>
+            </div>
+
+            <span class="scale" id="scaleText">100%</span>
+        </div>
+    </main>
+</div>
+
+<script>
+    const btn = document.getElementById("floorButton");
+    const drop = document.getElementById("floorDropdown");
+    const floorItems = document.querySelectorAll(".floor-item");
+    const planWrapper = document.getElementById('planWrapper');
+    const planImage = document.getElementById('planImage');
+    const zoomInBtn = document.getElementById('zoomIn');
+    const zoomOutBtn = document.getElementById('zoomOut');
+    const scaleText = document.getElementById('scaleText');
+
+    let scale = 1;
+    let posX = 0;
+    let posY = 0;
+    let isDragging = false;
+    let startX, startY;
+
+    const MIN_SCALE = 0.1;
+    const MAX_SCALE = 5;
+    const ZOOM_STEP = 0.25;
+
+    function updateImage() {
+        planImage.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+        scaleText.textContent = `${Math.round(scale * 100)}%`;
+    }
+
+    function zoomIn() {
+        if (scale < MAX_SCALE) {
+            scale += ZOOM_STEP;
+            updateImage();
+        }
+    }
+
+    function zoomOut() {
+        if (scale > MIN_SCALE) {
+            scale -= ZOOM_STEP;
+            updateImage();
+        }
+    }
+
+    function resetView() {
+        scale = 1;
+        posX = 0;
+        posY = 0;
+        updateImage();
+    }
+
+    zoomInBtn.addEventListener('click', zoomIn);
+    zoomOutBtn.addEventListener('click', zoomOut);
+
+    planWrapper.addEventListener('mousedown', startDrag);
+    
+    function startDrag(e) {
+        e.preventDefault();
+        isDragging = true;
+        startX = e.clientX - posX;
+        startY = e.clientY - posY;
+        planWrapper.style.cursor = 'grabbing';
+        document.addEventListener('mousemove', doDrag);
+        document.addEventListener('mouseup', stopDrag);
+    }
+
+    function doDrag(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        posX = e.clientX - startX;
+        posY = e.clientY - startY;
+        updateImage();
+    }
+
+    function stopDrag() {
+        isDragging = false;
+        planWrapper.style.cursor = 'grab';
+        document.removeEventListener('mousemove', doDrag);
+        document.removeEventListener('mouseup', stopDrag);
+    }
+
+    planWrapper.addEventListener('wheel', handleWheel, { passive: false });
+    
+    function handleWheel(e) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -1 : 1;
+        const rect = planWrapper.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const scaleBefore = scale;
+        scale += delta * ZOOM_STEP * 0.5;
+        scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale));
+        
+        if (scale !== scaleBefore) {
+            const scaleFactor = scale / scaleBefore;
+            posX = mouseX - (mouseX - posX) * scaleFactor;
+            posY = mouseY - (mouseY - posY) * scaleFactor;
+            updateImage();
+        }
+    }
+
+    planWrapper.addEventListener('dblclick', resetView);
+    window.addEventListener('resize', updateImage);
+    updateImage();
+
+    btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        drop.classList.toggle("show");
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.floor-select-wrapper')) {
+            drop.classList.remove('show');
+        }
+    });
+
+    floorItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const selectedText = item.textContent;
+            btn.textContent = selectedText;
+            drop.classList.remove('show');
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            drop.classList.remove('show');
+        }
+        if (e.ctrlKey) {
+            if (e.key === '+' || e.key === '=') {
+                e.preventDefault();
+                zoomIn();
+            } else if (e.key === '-' || e.key === '_') {
+                e.preventDefault();
+                zoomOut();
+            } else if (e.key === '0') {
+                e.preventDefault();
+                resetView();
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
