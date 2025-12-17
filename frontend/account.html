@@ -68,7 +68,7 @@
 
         <div class="tab-content active" id="loginTab">
             <h2>Вход в аккаунт</h2>
-            <form class="auth-form">
+            <form class="auth-form" id="registerForm"">
                 <input type="email" placeholder="Имя пользователя или Email" required>
                 <input type="password" placeholder="Пароль" required>
                 <button type="submit" class="submit-btn">Войти</button>
@@ -99,6 +99,7 @@
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
     const switchTabLinks = document.querySelectorAll('.switch-tab');
+    const registerForm = document.getElementById('registerForm');
 
     openModalBtn.addEventListener('click', () => {
         modalOverlay.classList.add('active');
@@ -157,13 +158,36 @@
         }
     });
 
-    document.querySelectorAll('.auth-form').forEach(form => {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Форма отправлена!');
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = 'auto';
+    // Отправка формы регистрации
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const inputs = registerForm.querySelectorAll('input');
+
+        const data = {
+            first_name: inputs[0].value,
+            last_name: inputs[1].value,
+            email: inputs[2].value,
+            password: inputs[3].value,
+            repeat_password: inputs[4].value
+        };
+
+        const response = await fetch('http://localhost:5500/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
         });
+
+        const result = await response.json();
+
+        if (result.status === 'ok') {
+            alert('Регистрация успешна');
+            modalOverlay.classList.remove('activate');
+        } else {
+            alert(result.error);
+        }
     });
 </script>
 
