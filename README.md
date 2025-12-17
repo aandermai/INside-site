@@ -57,3 +57,5 @@ docker compose down
 - Профиль (имя, фамилия, email)
 - Выход из аккаунта
 - Данные сохраняются между перезапусками
+
+Autor: Artem Petrushin
