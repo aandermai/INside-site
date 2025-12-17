@@ -42,7 +42,7 @@ docker compose down
 
 ## Запуск без Docker (для разработчиков)
 1. Установи Go: https://go.dev/dl/
-2. В папке проекта: go run ./backend/main.go
+2. В папке проекта: ``` go run ./backend/main.go ```
 3. Открой http://localhost:9000
 
 База создастся автоматически в папке data.
