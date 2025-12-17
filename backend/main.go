@@ -42,17 +42,11 @@ func initDB() {
 	}
 }
 
-// Универсальная функция для CORS
-func setCORS(w http.ResponseWriter) {
+// Обработчик регистрации
+func registerHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-}
-
-// Обработчик регистрации
-func registerHandler(w http.ResponseWriter, r *http.Request) {
-	setCORS(w)
-
 	// Обработка preflight запроса
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
