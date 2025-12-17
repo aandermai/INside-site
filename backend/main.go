@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var db *sql.DB // Глобальная переменная БД
+var db *sql.DB
 
 type RegisterRequest struct {
 	FirstName      string `json:"first_name"`
@@ -20,20 +20,16 @@ type RegisterRequest struct {
 	RepeatPassword string `json:"repeat_password"`
 }
 
-/*
-Функция для инициализации БД и создания таблицы пользователей,
-если её не существует.
-*/
+// Инициализация БД
 func initDB() {
 	var err error
 	db, err = sql.Open("sqlite3", "app.db")
-
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	query := `
-	CREATE TABLE IF NOT EXIST users (
+	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		first_name TEXT,
 		last_name TEXT,
@@ -41,15 +37,27 @@ func initDB() {
 		password_hash TEXT
 	);
 	`
-
 	if _, err := db.Exec(query); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func registerHandler(w http.ResponseWriter, r *http.Request) {
+// Универсальная функция для CORS
+func setCORS(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+}
+
+// Обработчик регистрации
+func registerHandler(w http.ResponseWriter, r *http.Request) {
+	setCORS(w)
+
+	// Обработка preflight запроса
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -57,7 +65,6 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req RegisterRequest
-
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, `{"error":"Некорректные данные"}`, http.StatusBadRequest)
 		return
@@ -73,11 +80,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hash, err := bcrypt.GenerateFromPassword(
-		[]byte(req.Password),
-		bcrypt.DefaultCost,
-	)
-
+	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		http.Error(w, `{"error":"Ошибка сервера"}`, http.StatusInternalServerError)
 		return
@@ -85,20 +88,15 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Exec(
 		"INSERT INTO users (first_name, last_name, email, password_hash) VALUES (?, ?, ?, ?)",
-		req.FirstName,
-		req.LastName,
-		req.Email,
-		string(hash),
+		req.FirstName, req.LastName, req.Email, string(hash),
 	)
-
 	if err != nil {
-		http.Error(w, `{"error":"Email уже используется"}`, http.StatusBadRequest)
+		log.Println("Ошибка вставки в БД:", err)
+		http.Error(w, `{"error":"Email уже используется или другая ошибка"}`, http.StatusBadRequest)
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]string{
-		"status": "ok",
-	})
+	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
 
 func main() {
@@ -106,6 +104,6 @@ func main() {
 
 	http.HandleFunc("/register", registerHandler)
 
-	log.Println("Сервер запущен на порту 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Сервер запущен на порту 9000")
+	log.Fatal(http.ListenAndServe(":9000", nil))
 }

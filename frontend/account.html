@@ -68,7 +68,7 @@
 
         <div class="tab-content active" id="loginTab">
             <h2>Вход в аккаунт</h2>
-            <form class="auth-form" id="registerForm"">
+            <form class="auth-form">
                 <input type="email" placeholder="Имя пользователя или Email" required>
                 <input type="password" placeholder="Пароль" required>
                 <button type="submit" class="submit-btn">Войти</button>
@@ -78,7 +78,7 @@
 
         <div class="tab-content" id="registerTab">
             <h2>Создание аккаунта</h2>
-            <form class="auth-form">
+            <form class="auth-form" id="registerForm">
                 <input type="text" placeholder="Имя" required>
                 <input type="text" placeholder="Фамилия" required>
                 <input type="email" placeholder="Email" required>
@@ -172,7 +172,7 @@
             repeat_password: inputs[4].value
         };
 
-        const response = await fetch('http://localhost:8080/register', {
+        const response = await fetch('http://localhost:9000/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -184,7 +184,7 @@
 
         if (result.status === 'ok') {
             alert('Регистрация успешна');
-            modalOverlay.classList.remove('activate');
+            modalOverlay.classList.remove('active');
         } else {
             alert(result.error);
         }
