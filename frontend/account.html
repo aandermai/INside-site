@@ -35,7 +35,14 @@
     <main class="content">
         <div class="top-bar">
             <h1 class="title">Ваш аккаунт</h1>
-            <button class="auth-btn" id="openAuthModal">Зарегистрироваться/Войти</button>
+            
+            <div id="authButtons">
+                <!-- Кнопка для гостей — видна по умолчанию -->
+                <button class="auth-btn" id="openAuthModal">Зарегистрироваться/Войти</button>
+                
+                <!-- Кнопка "Выйти" — скрыта по умолчанию, пока не залогинимся -->
+                <button class="auth-btn" id="logoutBtn" style="display: none;">Выйти</button>
+            </div>
         </div>
 
         <div class="profile">
@@ -43,10 +50,11 @@
                 <img src="images/avatar.png" alt="Мое фото">
             </div>
             <div class="info">
-                <h2 class="name">Маргарита<br>Анатольевна</h2>
-                <p class="email">margoanatoliy@gmail.com</p>
+                <h2 class="name">Гость</h2>
+                <p class="email"></p>
             </div>
         </div>
+
 
         <div class="card-list">
             <div class="card">Главный корпус ПетрГУ</div>
@@ -68,7 +76,7 @@
 
         <div class="tab-content active" id="loginTab">
             <h2>Вход в аккаунт</h2>
-            <form class="auth-form">
+            <form class="auth-form" id="loginForm">
                 <input type="email" placeholder="Имя пользователя или Email" required>
                 <input type="password" placeholder="Пароль" required>
                 <button type="submit" class="submit-btn">Войти</button>
@@ -91,105 +99,7 @@
     </div>
 </div>
 
-<script>
-    const openModalBtn = document.getElementById('openAuthModal');
-    const closeModalBtn = document.getElementById('closeAuthModal');
-    const modalOverlay = document.getElementById('authModalOverlay');
-    const modal = document.getElementById('authModal');
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-    const switchTabLinks = document.querySelectorAll('.switch-tab');
-    const registerForm = document.getElementById('registerForm');
-
-    openModalBtn.addEventListener('click', () => {
-        modalOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
-
-    closeModalBtn.addEventListener('click', () => {
-        modalOverlay.classList.remove('active');
-        document.body.style.overflow = 'auto';
-    });
-
-    modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) {
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-    });
-
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tabId = btn.getAttribute('data-tab');
-            
-            tabBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            tabContents.forEach(content => {
-                content.classList.remove('active');
-                if (content.id === tabId + 'Tab') {
-                    content.classList.add('active');
-                }
-            });
-        });
-    });
-
-    switchTabLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const tabId = link.getAttribute('data-tab');
-            
-            tabBtns.forEach(b => b.classList.remove('active'));
-            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-            
-            tabContents.forEach(content => {
-                content.classList.remove('active');
-                if (content.id === tabId + 'Tab') {
-                    content.classList.add('active');
-                }
-            });
-        });
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-    });
-
-    // Отправка формы регистрации
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const inputs = registerForm.querySelectorAll('input');
-
-        const data = {
-            first_name: inputs[0].value,
-            last_name: inputs[1].value,
-            email: inputs[2].value,
-            password: inputs[3].value,
-            repeat_password: inputs[4].value
-        };
-
-        const response = await fetch('http://localhost:9000/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (result.status === 'ok') {
-            alert('Регистрация успешна');
-            modalOverlay.classList.remove('active');
-        } else {
-            alert(result.error);
-        }
-    });
-</script>
+<script src="./scripts/auth.js"></script>
 
 </body>
 </html>
