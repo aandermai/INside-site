@@ -1,0 +1,8 @@
+version: '3.9'
+services:
+  app:
+    build: .
+    ports:
+      - "9000:9000"        # чтобы сервер был доступен с хоста
+    volumes:
+      - ./data:/app/data   # сохраняем файлы SQLite локально
