@@ -8,20 +8,18 @@ import (
 )
 
 func main() {
-	// Подключение к БД
 	db.InitDB()
 	log.Println("База данных подключена")
 
-	// Запросы к хендлерам
-	http.HandleFunc("/login", handlers.LoginHandler)       // вход
-	http.HandleFunc("/register", handlers.RegisterHandler) // регистрация
-	http.HandleFunc("/profile", handlers.ProfileHandler)   // данные профиля
-	http.HandleFunc("/logout", handlers.LogoutHandler)     // выход
+	// API
+	http.HandleFunc("/login", handlers.LoginHandler)
+	http.HandleFunc("/register", handlers.RegisterHandler)
+	http.HandleFunc("/profile", handlers.ProfileHandler)
+	http.HandleFunc("/logout", handlers.LogoutHandler)
 
-	// Раздача всех файлов из папки frontend
-	http.Handle("/", http.FileServer(http.Dir("./frontend")))
+	fs := http.FileServer(http.Dir("../frontend"))
+	http.Handle("/", fs)
 
-	// Запуск сервера
-	log.Println("Сервер запущен! Открой в браузере: http://localhost:9000")
+	log.Println("Сервер запущен: http://localhost:9000")
 	log.Fatal(http.ListenAndServe(":9000", nil))
 }
