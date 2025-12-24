@@ -38,7 +38,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Обработка только POST-запросов
 	if r.Method != http.MethodPost {
-		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+		http.Error(w, `{"error":"Метод не поддерживается"}`, http.StatusMethodNotAllowed)
 		return
 	}
 
