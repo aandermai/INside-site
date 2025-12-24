@@ -46,7 +46,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Парсим данные с полученного JSON
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Некорректный JSON", http.StatusBadRequest)
+		http.Error(w, `{"error":"Некорректный JSON"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -57,13 +57,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Если email нет в базе
 	if err == sql.ErrNoRows {
-		http.Error(w, "Неверный email или пароль", http.StatusUnauthorized)
+		http.Error(w, `{"error":"Неверный email или пароль"}`, http.StatusUnauthorized)
 		return
 	}
 
 	// Если произошла другая ошибка с базой
 	if err != nil {
-		http.Error(w, "Ошибка сервера", http.StatusInternalServerError)
+		http.Error(w, `{"error":"Ошибка сервера"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -72,7 +72,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Если не совпадают
 	if err != nil {
-		http.Error(w, "Неверный email или пароль", http.StatusUnauthorized)
+		http.Error(w, `{"error":"Неверный email или пароль"}`, http.StatusUnauthorized)
 		return
 	}
 
@@ -81,7 +81,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Проверка на успешную генерацию
 	if err != nil {
-		http.Error(w, "Ошибка сервера", http.StatusInternalServerError)
+		http.Error(w, `{"error":"Ошибка сервера"}`, http.StatusInternalServerError)
 		return
 	}
 
